@@ -1,6 +1,8 @@
 # Workshop
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.9.
+Data persistence and state management are handled using NgRx in combination with localStorage.
+The user interface is built with CSS, SCSS, and Angular Material.
 
 ## Development server
 
