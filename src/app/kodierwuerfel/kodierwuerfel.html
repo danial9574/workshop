@@ -1,0 +1,54 @@
+<div class="container">
+  <form [formGroup]="form">
+    <mat-form-field class="text">
+      <mat-label>Schlüsselwort</mat-label>
+      <input
+        matInput
+        formControlName="keyword"
+        style="white-space: pre"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+    </mat-form-field>
+
+    <mat-form-field class="text">
+      <mat-label>Text</mat-label>
+      <textarea
+        matInput
+        formControlName="inputText"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        style="white-space: pre; font-family: monospace"
+        wrap="off"
+      ></textarea>
+    </mat-form-field>
+  </form>
+
+  <button mat-button (click)="verschluesseln()">Verschlüsseln</button>
+  <button mat-button (click)="entschluesseln()">Entschlüsseln</button>
+
+  <div class="result">
+    <h3>Ergebnis:</h3>
+    @if (lockedText) {
+    <p class="result-text">{{ lockedText }}</p>
+    } @if (unLockedText) {
+    <p>{{ unLockedText }}</p>
+    }
+  </div>
+
+  <h3>Tabelle:</h3>
+
+  <table class="alphabet-table">
+    @for (row of table; track $index) {
+    <tr>
+      @for (cell of row; track $index) {
+      <td>{{ cell }}</td>
+      }
+    </tr>
+    }
+  </table>
+</div>

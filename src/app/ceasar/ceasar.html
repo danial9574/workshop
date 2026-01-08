@@ -1,0 +1,24 @@
+
+<div class="inputField">
+    <table class="alphabet-table">
+      <tr>  
+        @for (letter of alphabetToM; track alphabetToM) {
+            <td>{{ letter }}</td>
+        }
+      </tr>
+      <tr>
+        @for (letter of alphabetToZ; track alphabetToZ) {
+            <td>{{ letter }}</td>
+        }
+      </tr>
+    </table>
+      <input class="input" [(ngModel)]="inputNumber" placeholder="number">
+      <textarea class="inputArea" [(ngModel)]="inputAlphabet" placeholder="alphabet"></textarea>
+      <button matButton="tonal" (click)="doTheEntschluss()">Entschlüsselung</button>
+      <button matButton="tonal" (click)="doTheVerschluss()">Verschlüsselung</button>
+       @if (result.length > 0) {
+        <p>{{ result }}</p>
+        } @else {
+        <p>{{ errorMessage }}</p>
+       }
+</div>

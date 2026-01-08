@@ -1,0 +1,13 @@
+<div>
+  <span class="not-expired">
+    @if (!(expired$ | async)) {
+    ⏳ {{ remainingText$ | async  }}
+    }
+  </span>
+
+  <span class="expired">
+      @if (expired$ | async){
+        ⏳fertig
+    }
+  </span>
+</div>

@@ -1,0 +1,48 @@
+
+
+button {
+    display: block;
+    margin-top: 1rem;
+}
+.inputField {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 500px;
+    height: 300px;
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.input {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.inputArea {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.alphabet-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+@media (min-width: 220px) and (max-width: 510px) {
+  .inputField {
+    width: auto;
+    top: auto;
+    left: auto;
+    transform: none;
+  }
+}

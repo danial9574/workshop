@@ -1,0 +1,205 @@
+<!-- @if (!loginStatus) {
+  <app-login (emitLoginsucces)="onlogginStatus($event)"></app-login>
+}
+ -->
+@if (!loginStatus) {
+<div class="container">
+  <mat-tab-group>
+    <mat-tab label="Aktion erstellen">
+      <mat-stepper #stepper>
+        <mat-step>
+          <ng-template matStepLabel> Title und Beschreibung</ng-template>
+          <form [formGroup]="detailFormGroup" class="set-title-container">
+            <mat-form-field>
+              <mat-label>Title</mat-label>
+              <input matInput formControlName="titleCtrl" placeholder="" required />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Beschreibung</mat-label>
+              <textarea
+                matInput
+                formControlName="noticeCtrl"
+                placeholder="Beschreibung des Artikels"
+              >
+              </textarea>
+            </mat-form-field>
+            <div>
+              <button matButton matStepperPrevious>Back</button>
+              <button matButton matStepperNext (click)="setDetail()">Next</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step [stepControl]="editForm">
+          <form [formGroup]="editForm">
+            <ng-template matStepLabel>Bild Hochladen</ng-template>
+            <div class="download-container">
+              <form id="editForm" name="editForm" [formGroup]="editForm">
+                <mat-form-field appearance="fill">
+                  <div class="fileUploadContainer">
+                    <div fxLayoutAlign="center center" fxLayoutGap="10px">
+                      <mat-icon style="opacity: 60%">file_upload</mat-icon>
+                    </div>
+                    <input
+                      #fileInput
+                      class="fileInput"
+                      type="file"
+                      multiple="multiple"
+                      accept="image/*"
+                      (change)="setFileData($event)"
+                    />
+                  </div>
+                  <input matInput formControlName="photo" readonly [hidden]="true" />
+                  @if (editForm.get('photo')!.value) {<img
+                    [src]="editForm.get('photo')!.value"
+                    class="food-image"
+                  />}
+                </mat-form-field>
+              </form>
+              <button matButton matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Dauer</ng-template>
+          <div class="during-container">
+            <mat-card-title>Datum Auswählen</mat-card-title>
+            <form [formGroup]="dateGroup">
+              <mat-form-field style="width: 300px">
+                <mat-label>Choose a date</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="date" />
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </form>
+            <button matButton matStepperPrevious>Back</button>
+            <button matButton matStepperNext (click)="setDuration()">Next</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel> Start Preis</ng-template>
+          <div class="amount-container">
+            <form action="" [formGroup]="priceGroup">
+              <mat-form-field floatLabel="always">
+                <mat-label>Preis</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  class="example-right-align"
+                  placeholder="0"
+                  formControlName="priceCntrl"
+                />
+                <span matTextPrefix>€&nbsp;</span>
+                <span matTextSuffix>.00</span>
+              </mat-form-field>
+            </form>
+            <button matButton matStepperPrevious>Back</button>
+            <button matButton (click)="addArtikel()">save</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </mat-tab>
+    <mat-tab label="Aktion Details">
+      <div>
+        @for (f of (artikels$ | async); track f) {
+        <mat-card class="detail-card">
+          @if (isSaledOut && saledArtikelId === f.id) {
+          <mat-icon>cancel</mat-icon>
+          }
+          <div class="artikel-title">
+            <mat-card-title>{{ f.detail.title }}</mat-card-title>
+            <mat-icon class="delete_icon" (click)="deleteArtikel(f.id)">delete_forever</mat-icon>
+          </div>
+          <div class="card-container">
+            <mat-card-content class="artikel-detail">
+              <div class="dauer-container">
+                <mat-icon>date_range</mat-icon>
+                <p>Dauer : {{ f.duration }}</p>
+              </div>
+              <div class="detail-container">
+                <mat-icon>perm_device_information</mat-icon>
+                <p>Besschreibung: {{ f.detail.notice }}</p>
+              </div>
+              <div class="firstPrice_container">
+                <mat-icon> attach_money</mat-icon>
+                <p>Start Preis : {{ f.firstPrice }} €</p>
+              </div>
+            </mat-card-content>
+          </div>
+        </mat-card>
+        }
+      </div>
+    </mat-tab>
+    <mat-tab label="Gebot geben">
+      <div class="left-details">
+        <span class="mat-icon png-icon">
+          <img src="assets/coin.png" alt="Coin" />
+          <p class="coins">coins: {{ coins }}</p>
+        </span>
+        <div class="reset-timer">
+          @if (artikeForSale?.length > 0) {
+          <app-reset-timer
+            [TimerShouldReset]="emitTimerReset"
+            (timerExpired)="saleArtikel($event)"
+          ></app-reset-timer>
+          }
+        </div>
+      </div>
+      <div class="search-Container">
+        <mat-form-field appearance="outline">
+          <mat-label>Suche</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput type="text" placeholder="Suchen..." (input)="onSearchChange($event)" />
+        </mat-form-field>
+      </div>
+      <div>
+        @for (f of (artikeForSale); track f) {
+        <mat-card class="detail-card">
+          @if (isSaledOut && saledArtikelId === f.id) {
+          <mat-icon>cancel</mat-icon>
+          }
+          <div class="artikel-title">
+            <mat-card-title>{{ f.detail.title }}</mat-card-title>
+          </div>
+          <div class="card-container">
+            <mat-card-content class="artikel-detail">
+              <div class="dauer-container">
+                <mat-icon>date_range</mat-icon>
+                <p>Dauer : {{ f.duration }}</p>
+              </div>
+              <div class="detail-container">
+                <mat-icon>perm_device_information</mat-icon>
+                <p>Besschreibung: {{ f.detail.notice }}</p>
+              </div>
+              <div class="firstPrice_container">
+                <mat-icon> attach_money</mat-icon>
+                <p>Start Preis : @if (f.firstPrice > 0) { {{ f.firstPrice }} € }</p>
+              </div>
+              @if (emitTimerReset) {
+              <div class="firstPrice_container">
+                <mat-icon>money_off</mat-icon>
+                <p>Gebot Preis : @if (newFirstPrice > 0) { {{ newFirstPrice }} € }</p>
+              </div>
+              }
+              <div class="gebot-button">
+                <mat-icon>gavel</mat-icon>
+                @if (isSaledOut && saledArtikelId === f.id) {
+                <button mat-button color="primary" (click)="placeBid(f.firstPrice, f.id)" disabled>
+                  Gebot abgeben
+                </button>
+                } @else if (!isSaledOut || saledArtikelId !== f.id) {
+                <button mat-button color="primary" (click)="placeBid(f.firstPrice, f.id)">
+                  Gebot abgeben
+                </button>
+                }
+              </div>
+            </mat-card-content>
+          </div>
+        </mat-card>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+}

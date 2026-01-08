@@ -1,0 +1,155 @@
+<mat-tab-group dynamicHeight>
+  <!-- TAB 1 -->
+  <mat-tab label="Essen Hinzufügen">
+    <section class="add_food_container">
+      <div class="label">Essen Hinzufügen</div>
+
+      <h4>Name des Kühlschrankes</h4>
+      <mat-form-field>
+        <mat-label>Kühlschrank auswählen</mat-label>
+        <mat-select [formControl]="selectedFreezerId">
+          @for (f of (freezers$ | async); track f) {
+          <mat-option [value]="f.id">{{ f.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <h4>Essen in die Fächer einfügen</h4>
+      <mat-form-field class="foods">
+        <mat-label>Essen (Name)</mat-label>
+        <input matInput [formControl]="foodName" />
+      </mat-form-field>
+
+      <form id="dateGroup" name="dateGroup" [formGroup]="dateGroup" style="width: max-content">
+        <mat-form-field style="width: 300px">
+          <mat-label>Choose a date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="date" />
+          <mat-hint>MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </form>
+
+      <mat-form-field class="notice">
+        <mat-label>Bezeichnung auf dem Essen</mat-label>
+        <textarea matInput [formControl]="foodLabel"></textarea>
+      </mat-form-field>
+
+      <mat-form-field class="faecher_number">
+        <mat-label>Nummer der Fächer</mat-label>
+        <input matInput type="number" [formControl]="fachNumber" />
+      </mat-form-field>
+      <div class="download-container">
+        <form id="editForm" name="editForm" [formGroup]="editForm">
+          <mat-form-field appearance="fill">
+            <div class="fileUploadContainer">
+              <div fxLayoutAlign="center center" fxLayoutGap="10px">
+                <mat-icon style="opacity: 60%">file_upload</mat-icon>
+              </div>
+              <input
+                #fileInput
+                class="fileInput"
+                type="file"
+                multiple="multiple"
+                accept="image/*"
+                (change)="setFileData($event)"
+              />
+            </div>
+            <input matInput formControlName="photo" readonly [hidden]="true" />
+            @if (editForm.get('photo')!.value) {<img
+              [src]="editForm.get('photo')!.value"
+              class="food-image"
+            />}
+          </mat-form-field>
+        </form>
+      </div>
+
+      <div class="button">
+        <button mat-raised-button color="primary" (click)="addFoodToFreezer()">Hinzufügen</button>
+      </div>
+    </section>
+  </mat-tab>
+
+  <!-- TAB 2 -->
+  <mat-tab label="Neue Kühlschränke anlegen">
+    <section class="add_refrigrator_container">
+      <h4>Neues Schrank anlegen</h4>
+      <mat-form-field>
+        <mat-label>Anzahl der Fächer</mat-label>
+        <input matInput type="number" [formControl]="freezerFachCount" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Name des Schranks</mat-label>
+        <input matInput [formControl]="freezerName" />
+      </mat-form-field>
+
+      <div class="button">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="createFreezer()"
+          class="create_freezer_button"
+        >
+          anlegen
+        </button>
+      </div>
+    </section>
+  </mat-tab>
+
+  <!-- TAB 3 -->
+  <mat-tab label="Alle gespeicherten Foods">
+    <div class="saved_foods_container">
+      <div class="search-Container">
+        <mat-form-field appearance="outline">
+          <mat-label>Suche</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput type="text" placeholder="Suchen..." (input)="onSearchChange($event)" />
+        </mat-form-field>
+      </div>
+      @for (f of (freezers$ | async); track f) {
+      <mat-card-title class="freezer-title"
+        >{{ f.name }} ({{ f.faecher.length }} Fächer)</mat-card-title
+      >
+      <mat-divider class="freezer-divider"></mat-divider>
+      @for (food of (foods$ | async); track food.id) { @if (f.id === food.freezerId) {
+      <mat-card class="detail-card">
+        <div class="food-title">
+          <mat-card-title>{{ food.name }}</mat-card-title>
+          @if (reminder(food)) {
+          <p class="reminder">{{ remindTitle }}</p>
+          }
+          <mat-icon class="delete_icon" (click)="deleteFood(food.id)">delete_forever</mat-icon>
+        </div>
+        <div class="card-container">
+          <mat-card-content class="food-details">
+            <p>Fach: {{ food.fachNumber }}</p>
+            <p>Bezeichnung: {{ food.bezeichnung }}</p>
+            @if (food.date) {
+            <p>Datum: {{ food.date }}</p>
+            }
+          </mat-card-content>
+          @if (food.photo) { <img [src]="food.photo" class="food-image" />}
+        </div>
+      </mat-card>
+      } } }
+    </div>
+  </mat-tab>
+
+  <!-- TAB 4 -->
+  <mat-tab label="Alle gespeicherten freezers">
+    <div class="saved-refrigrators_container">
+      <mat-card class="detail-card">
+        <mat-card-title>Existierende Schränke</mat-card-title>
+        @for (f of (freezers$ | async) ; track f) {
+        <mat-card-content class="freezer_card_content">
+          <mat-icon class="freezer_delete_icon" (click)="deleteFreezer(f.id)"
+            >delete_forever</mat-icon
+          >
+          {{ f.name }} ({{ f.faecher.length }} Fächer)
+        </mat-card-content>
+        }
+      </mat-card>
+    </div>
+  </mat-tab>
+</mat-tab-group>
